@@ -1,0 +1,85 @@
+- include: "{{ ansible_os_family }}.yml"
+  tags: github-backup
+  become: yes
+
+- name: pip install
+  pip: name={{item}}
+  with_items:
+    - httplib2
+  become: yes
+
+- name: create {{github_backup_user}} group
+  group: name={{github_backup_user}} state=present
+  become: yes
+  tags: github-backup
+
+- name: create {{github_backup_user}} user
+  user: name={{github_backup_user}} groups={{github_backup_user}} state=present
+  become: yes
+  tags: github-backup
+
+- name: create ssh folder
+  file: 
+    path: "/home/{{github_backup_user}}/.ssh"
+    state: directory
+    owner: "{{github_backup_user}}"
+    group: "{{github_backup_user}}"
+    mode: 0755
+  become: yes
+  tags: github-backup
+
+- name: create github-backup folder
+  file: 
+    path: "/opt/github-backup"
+    state: directory
+    owner: "{{github_backup_user}}"
+    group: "{{github_backup_user}}"
+    mode: 0755
+  become: yes
+  tags: github-backup
+
+- name: copy github-backup script
+  copy:
+    src: '../files/gitback.py' 
+    dest: "/opt/github-backup/gitback.py"
+    owner: "{{github_backup_user}}"
+    group: "{{github_backup_user}}"
+    mode: 0755
+  become: yes
+  tags: github-backup
+
+- name: copy github-backup config
+  template:
+    src: config.ini.j2
+    dest: /opt/github-backup/config.ini
+    owner: "{{github_backup_user}}"
+    group: "{{github_backup_user}}"
+    mode: 0600
+  become: yes
+  tags: github-backup
+
+- name: copy ssh private key
+  copy:
+    content: "{{ github_backup_ssh_key }}"
+    dest: "/home/{{github_backup_user}}/.ssh/id_rsa"
+    owner: "{{github_backup_user}}"
+    group: "{{github_backup_user}}"
+    mode: 0600
+  become: yes
+  tags: github-backup
+
+- name: ssh keyscan
+  shell: 'ssh-keyscan github.com >> /home/{{github_backup_user}}/.ssh/known_hosts'
+  become: yes
+  tags: github-backup
+
+- name: add task to cron
+  cron: 
+    name: 'Github-Backup'
+    minute: '0'
+    hour: '0'
+    day: '*'
+    user: "{{github_backup_user}}"
+    job: 'cd /opt/github-backup/ && python gitback.py'
+  tags: github-backup
+  become: yes
