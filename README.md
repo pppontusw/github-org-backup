@@ -14,6 +14,8 @@ CNF_PASS=$OAUTHKEY$
 CNF_ORGNAME=githuborg
 # The folder to backup to (in your home folder)
 CNF_BKPFOLDER=githubbackups
+# The number of days to keep backups
+CNF_DAYSTOKEEP=14
 ```
 And run the script (manually once to accept host key of github.com) or cron it to make daily backups for example, but make sure to do:
 

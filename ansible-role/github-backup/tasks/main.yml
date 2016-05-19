@@ -40,11 +40,14 @@
 
 - name: copy github-backup script
   copy:
-    src: '../files/gitback.py' 
-    dest: "/opt/github-backup/gitback.py"
+    src: '../files/{{item}}.py' 
+    dest: "/opt/github-backup/{{item}}.py"
     owner: "{{github_backup_user}}"
     group: "{{github_backup_user}}"
     mode: 0755
+  with_items:
+    - gitback
+    - gitclean
   become: yes
   tags: github-backup
 
@@ -81,5 +84,16 @@
     day: '*'
     user: "{{github_backup_user}}"
     job: 'cd /opt/github-backup/ && python gitback.py'
+  tags: github-backup
+  become: yes
+
+- name: add task to cron
+  cron: 
+    name: 'Github-Cleanup'
+    minute: '0'
+    hour: '23'
+    day: '*'
+    user: "{{github_backup_user}}"
+    job: 'cd /opt/github-backup/ && python gitclean.py'
   tags: github-backup
   become: yes

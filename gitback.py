@@ -5,6 +5,8 @@ import base64
 import subprocess
 import os
 from ConfigParser import SafeConfigParser
+import tarfile
+import shutil
 
 try:
 	parser = SafeConfigParser()
@@ -15,8 +17,9 @@ try:
 	password = parser.get('CONFIG', 'CNF_PASS')
 except:
     print('config.ini is either invalid or does not exist. Please verify your config.ini file.')
+    exit()
 
-
+FNULL = open(os.devnull, 'w')
 timestamp = datetime.datetime.now()
 backupDirectory = os.environ['HOME'] + "/" + bkpfolder + "/" + str(timestamp.year) + str(timestamp.month) + str(timestamp.day)
 
@@ -30,6 +33,8 @@ def main():
 	c = 'h'
 	count = 1
 	repos = []
+	tar = tarfile.open(backupDirectory + '.tar', 'w')
+	os.chdir(backupDirectory)
 	while (c != []):
 		r, c = http.request('https://api.github.com/orgs/' + orgname + '/repos?page=' + str(count), 
 			'GET', 
@@ -39,9 +44,15 @@ def main():
 		for i in c:
 			repos.append(i['name'])
 	for repo in repos:
-		print('cloning ' + 'git@github.com:' + orgname + '/' + repo)
-		sproc = subprocess.Popen(["git", "clone", 'git@github.com:' + orgname + '/' + repo, backupDirectory + '/' + repo], stdout=subprocess.PIPE)
-		sproc.stdout.readlines()
+		print('Cloning ' + 'git@github.com:' + orgname + '/' + repo)
+		repodir = backupDirectory + '/' + repo
+		sproc = subprocess.call(["git", "clone", 'git@github.com:' + orgname + '/' + repo], stdout=FNULL)
+		tar.add(repo)
+	tar.close()
+	if os.path.isdir(backupDirectory):
+		shutil.rmtree(backupDirectory)
+	elif os.path.exists(backupDirectory):
+		os.remove(backupDirectory)
 
 if __name__ == '__main__':
 	main()
