@@ -2,6 +2,10 @@
   tags: github-backup
   become: yes
 
+- include_vars: "{{ ansible_os_family }}.yml"
+  tags: github-backup
+  become: yes
+
 - name: pip install
   pip: name={{item}}
   with_items:
@@ -83,7 +87,7 @@
     hour: '0'
     day: '*'
     user: "{{github_backup_user}}"
-    job: 'cd /opt/github-backup/ && python gitback.py'
+    job: 'cd /opt/github-backup/ && {{python_name}} gitback.py'
   tags: github-backup
   become: yes
 
@@ -94,6 +98,6 @@
     hour: '23'
     day: '*'
     user: "{{github_backup_user}}"
-    job: 'cd /opt/github-backup/ && python gitclean.py'
+    job: 'cd /opt/github-backup/ && {{python_name}} gitclean.py'
   tags: github-backup
   become: yes

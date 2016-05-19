@@ -4,12 +4,12 @@ import json
 import base64
 import subprocess
 import os
-from ConfigParser import SafeConfigParser
+import configparser
 import tarfile
 import shutil
 
 try:
-	parser = SafeConfigParser()
+	parser = configparser.ConfigParser()
 	parser.read('config.ini')
 	bkpfolder = parser.get('CONFIG', 'CNF_BKPFOLDER')
 	orgname = parser.get('CONFIG', 'CNF_ORGNAME')
@@ -29,7 +29,7 @@ def main():
 	except OSError:
 		print('folder probably already exists')
 	http = httplib2.Http()
-	auth = base64.b64encode(username + ':' + password)
+	auth = base64.b64encode(bytes(username, 'utf-8') + b':' + bytes(password, 'utf-8'))
 	c = 'h'
 	count = 1
 	repos = []
@@ -38,9 +38,9 @@ def main():
 	while (c != []):
 		r, c = http.request('https://api.github.com/orgs/' + orgname + '/repos?page=' + str(count), 
 			'GET', 
-			headers = { 'Authorization' : 'Basic %s' % auth })
+			headers = { 'Authorization' : 'Basic %s' % str(auth, 'utf-8') })
 		count += 1
-		c = json.loads(c)
+		c = json.loads(str(c, 'utf-8'))
 		for i in c:
 			repos.append(i['name'])
 	for repo in repos:

@@ -20,3 +20,5 @@ CNF_DAYSTOKEEP=14
 And run the script (manually once to accept host key of github.com) or cron it to make daily backups for example, but make sure to do:
 
 ```ssh-keyscan github.com >> ~/.ssh/known_hosts```
+
+## Compatible with PYTHON3

@@ -1,10 +1,10 @@
 import datetime
 import os
-from ConfigParser import SafeConfigParser
+import configparser
 import shutil
 
 try:
-	parser = SafeConfigParser()
+	parser = configparser.ConfigParser()
 	parser.read('config.ini')
 	bkpfolder = parser.get('CONFIG', 'CNF_BKPFOLDER')
 	daystokeep = parser.get('CONFIG', 'CNF_DAYSTOKEEP')
