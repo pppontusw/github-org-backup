@@ -42,16 +42,8 @@
   become: yes
   tags: github-backup
 
-- name: copy github-backup script
-  copy:
-    src: '../files/{{item}}.py' 
-    dest: "/opt/github-backup/{{item}}.py"
-    owner: "{{github_backup_user}}"
-    group: "{{github_backup_user}}"
-    mode: 0755
-  with_items:
-    - gitback
-    - gitclean
+- name: git clone
+  git: repo=https://github.com/pppontusw/github-org-backup.git dest=/opt/github-backup
   become: yes
   tags: github-backup
 

@@ -1,7 +1,7 @@
 # user for local server
 github_backup_user: pc
 # username for github
-github_backup_username: universum-github-backup
+github_backup_username: github-backup
 # ssh key for github
 github_backup_ssh_key: "{{vault_github_backup_ssh_key}}" 
 
