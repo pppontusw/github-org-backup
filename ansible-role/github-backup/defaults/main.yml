@@ -1,11 +1,11 @@
 # user for local server
-github_backup_user: pc
+github_backup_user: serveruser
 # username for github
-github_backup_username: github-backup
+github_backup_username: github_account_name
 # ssh key for github
 github_backup_ssh_key: "{{vault_github_backup_ssh_key}}" 
 
-github_backup_password: gitpassword
+github_backup_password: github_personal_auth_key
 
 github_backup_orgname: orgname
 
